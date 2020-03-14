@@ -6,19 +6,37 @@
 
         <SearchBar></SearchBar>
 
+        <div class="queryResultsContainer">
+            <QueryResult v-for="result in queryResults" :result='result' v-bind:key="result.id"></QueryResult>
+        </div>
     </div>
 </template>
 
 <script>
 import SearchBar from "./SearchBar";
+import QueryResult from "./QueryResult";
 
 export default {
     components: {
-        SearchBar
+        SearchBar,
+        QueryResult
     },
     data () {
         return {
-        
+            queryResults: [
+                {
+                    type:"artist",
+                    name:"Linkin Park"
+                },
+                {
+                    type:"artist",
+                    name:"Francis Cabrel"
+                },
+                {
+                    type:"album",
+                    name:"No need to Argue"
+                }
+            ]
         }
     }
 }
@@ -29,5 +47,11 @@ export default {
     display:flex;
     flex-direction: column;
     align-items: center;
+}
+
+.queryResultsContainer {
+    display:flex;
+    flex-direction: column;
+    width:80%;
 }
 </style>

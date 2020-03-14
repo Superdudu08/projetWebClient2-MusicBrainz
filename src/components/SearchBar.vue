@@ -1,10 +1,12 @@
 <template>
   <div class="searchBarContainer"   @keyup.enter="sendSearchQuery">
-      <input v-model="searchInputValue" type="text" autofocus placeholder="Recherchez un artiste, un album..."><button class="btn btn-outline-dark"><i class="fal fa-arrow-right"></i></button>
+      <input v-model="searchInputValue" type="text" autofocus placeholder="Recherchez un artiste, un album..."><button v-on:click="sendSearchQuery()" class="btn btn-outline-dark"><i class="fal fa-arrow-right"></i></button>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data () {
     return {
@@ -13,7 +15,12 @@ export default {
   },
   methods: {
       sendSearchQuery(){
-          console.log('Recherche lancée sur ' + this.searchInputValue)
+          axios.get('http://musicbrainz.org/ws/2/artist/?query=artist:' + this.searchInputValue + '&fmt=json')
+          .then(response => console.log(response))
+          axios.get('http://musicbrainz.org/ws/2/recording/?query=recording:'+ this.searchInputValue +'&fmt=json')
+          .then(response => console.log(response))
+          axios.get('http://musicbrainz.org/ws/2/recording/?query=artistname:' + this.searchInputValue + '&fmt=json')
+          .then(response => console.log(response))
       }
   }
 }
