@@ -10,17 +10,54 @@ import axios from "axios";
 export default {
   data () {
     return {
-      searchInputValue: ""
+      searchInputValue: "",
+      minimumAcceptedScoreArtist: 99,
+      minimumAcceptedScoreRecording: 80,
     }
   },
   methods: {
       sendSearchQuery(){
+          this.$emit('newQueryStarted');
           axios.get('http://musicbrainz.org/ws/2/artist/?query=artist:' + this.searchInputValue + '&fmt=json')
-          .then(response => console.log(response))
+          .then(response => this.manageArtistData(response))
           axios.get('http://musicbrainz.org/ws/2/recording/?query=recording:'+ this.searchInputValue +'&fmt=json')
-          .then(response => console.log(response))
+          .then(response => this.manageRecordingData(response))
           axios.get('http://musicbrainz.org/ws/2/recording/?query=artistname:' + this.searchInputValue + '&fmt=json')
-          .then(response => console.log(response))
+          .then(response => this.manageRecordingData(response))
+      },
+      manageArtistData(response){
+        // Récupère la réponse de l'API concernant les artistes et envoie les résultats pertinents à la home page
+        const newQueryResults = []
+        for(const artist of response.data.artists) {
+          if(artist.score > this.minimumAcceptedScoreArtist && newQueryResults.length<8) {
+            newQueryResults.push({
+              name: artist.name,
+              type: "artist",
+              mbid: artist.id
+            })
+          }
+        }
+        if(newQueryResults.length>0) {
+          this.$emit('newQueryResultsReceived', newQueryResults);
+        }
+      },
+      manageRecordingData(response){
+        // Récupère la réponse de l'API concernant les recording et envoie les résultats pertinents à la home page
+        const newQueryResults = []
+        for(const recording of response.data.recordings) {
+          if(recording.score > this.minimumAcceptedScoreRecording && newQueryResults.length<8) {
+            console.log(recording)
+            newQueryResults.push({
+              name: recording.title,
+              type: "recording",
+              mbid: recording.id,
+              releaseid: recording.releases[0].id
+            })
+          }
+        }
+        if(newQueryResults.length>0) {
+          this.$emit('newQueryResultsReceived', newQueryResults);
+        }
       }
   }
 }

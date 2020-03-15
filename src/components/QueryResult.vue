@@ -1,6 +1,6 @@
 <template>
   <div class="queryResultContainer">
-    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" />
+    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" @error="getDefaultPicture"/>
     <div class="queryDetailsContainer">
       <h3>{{this.result.name}}</h3>
     </div>
@@ -20,7 +20,7 @@ export default {
   methods: {
     getPicture() {
         // Récupère un thumbnail pour le queryResult
-      if (this.result.type === "artist") {
+      if (this.result.type == "artist") {
         this.getArtistPicture();
       }
       else {
@@ -36,12 +36,11 @@ export default {
     },
     getRecordPicture() {
         // Récupère un thumbnail pour notre queryResult de type album/single avec l'API CovertArtArchive
-        console.log("On récupère un thumbnail record")
-        axios.get("http://musicbrainz.org/ws/2/release/?query=release:" + this.result.name + "&fmt=json")
-        .then(response => {
-            let releaseID = response.data.releases[0].id;
-            this.imageURL = "http://coverartarchive.org/release/"+ releaseID +"/front";
-        })
+        this.imageURL = "http://coverartarchive.org/release/"+ this.result.releaseid +"/front";
+    },
+    getDefaultPicture() {
+      // Utilisation de l'image par défaut
+      this.imageURL = "src/assets/defaultIconQueryResult.jpeg";
     }
   },
   mounted: function() {

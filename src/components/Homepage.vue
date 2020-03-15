@@ -4,7 +4,7 @@
         <h2>Recherchez vos artistes favoris, leurs albums et découvrez-en de nouveaux !</h2>
         <h4>Powered by MusicBrainz</h4>
 
-        <SearchBar></SearchBar>
+        <SearchBar @newQueryResultsReceived='onNewQueryResultsReceived' @newQueryStarted='onNewQueryStarted'></SearchBar>
 
         <div class="queryResultsContainer">
             <QueryResult v-for="result in queryResults" :result='result' v-bind:key="result.id"></QueryResult>
@@ -31,12 +31,20 @@ export default {
                 {
                     type:"artist",
                     name:"Francis Cabrel"
-                },
-                {
-                    type:"album",
-                    name:"No need to Argue"
                 }
             ]
+        }
+    },
+    methods: {
+        onNewQueryResultsReceived(queryResultArray) {
+            // On recoit un tableau de Query Result de la part de la search bar, on veut les ajouter à la home
+            for (const queryResult of queryResultArray){
+                this.queryResults.push(queryResult)
+            }
+        },
+        onNewQueryStarted() {
+            // L'utilisateur vient de lancer une nouvelle requête, on nettoie donc l'affichage
+            this.queryResults = [];
         }
     }
 }
