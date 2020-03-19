@@ -1,6 +1,6 @@
 <template>
   <div class="queryResultContainer">
-    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" @error="getDefaultPicture"/>
+    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" @error="getDefaultPicture" @click="onClick"/>
     <div class="queryDetailsContainer">
       <h3>{{this.result.name}}</h3>
     </div>
@@ -41,6 +41,16 @@ export default {
     getDefaultPicture() {
       // Utilisation de l'image par défaut
       this.imageURL = "src/assets/defaultIconQueryResult.jpeg";
+    },
+    onClick() {
+      // Evènement lancé quand l'utilisateur clique sur un queryResult
+      console.log(this.result);
+      if(this.result.type==="artist"){
+        this.onClickArtist();
+      }
+    },
+    onClickArtist() {
+      // Gestion du clic quand la QueryResult est un artiste
     }
   },
   mounted: function() {
