@@ -1,6 +1,6 @@
 <template>
-  <div class="queryResultContainer">
-    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" @error="getDefaultPicture" @click="onClick"/>
+  <div class="queryResultContainer" @click="onClick">
+    <img :src="this.imageURL" alt="Photo Artiste" class="queryResultImage" @error="getDefaultPicture" />
     <div class="queryDetailsContainer">
       <h3>{{this.result.name}}</h3>
     </div>
@@ -36,7 +36,17 @@ export default {
     },
     getRecordPicture() {
         // Récupère un thumbnail pour notre queryResult de type album/single avec l'API CovertArtArchive
-        this.imageURL = "http://coverartarchive.org/release/"+ this.result.releaseid +"/front";
+        // On essaie d'abord d'afficher l'image de type FRONT, si cela échoue, on récupère l'image par défaut liée au titre, et si cela échoue encore, on affiche une image par défaut.
+        axios.get("http://coverartarchive.org/release/"+ this.result.releaseid +"/front")
+        .then( response => {
+          console.log(response);
+          this.imageURL = "http://coverartarchive.org/release/"+ this.result.releaseid +"/front";
+        })
+        .catch(
+          axios.get("http://coverartarchive.org/release/"+ this.result.releaseid)
+          .then(this.imageURL = "http://coverartarchive.org/release/"+ this.result.releaseid)
+          .catch(this.getDefaultPicture())        
+        );        
     },
     getDefaultPicture() {
       // Utilisation de l'image par défaut
@@ -47,6 +57,9 @@ export default {
       console.log(this.result);
       if(this.result.type==="artist"){
         this.onClickArtist();
+      }
+      if(this.result.type==="recording"){
+        this.onClickRecording();
       }
     },
     onClickArtist() {
@@ -60,14 +73,29 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../scss/_variables.scss';
+
 .queryResultContainer {
   display: flex;
   width: 100%;
+  box-shadow: 0px 0px 0px 0.1rem darkgray;
+  border-radius:9px;
+  margin: 0.5em; //En combinaison avec box-shadow
+  margin-top: 8px;
+  transition: box-shadow 0.3s linear;
+  background-color:whitesmoke;
+  height:220px;
+  padding:4px;
+}
+
+.queryResultContainer:hover {
+  cursor:pointer;
+  box-shadow: 0px 0px 0px 0.2rem $baseColor;
 }
 
 .queryResultImage {
-  height: 200px;
-  width: 200px;
+  height: 180px;
+  width: 180px;
   border-radius: 50%;
 }
 </style>
